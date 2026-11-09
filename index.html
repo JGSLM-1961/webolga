@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>El taller de Olga</title>
+  <meta name="description" content="Pintura en tela y cuadros con hojas secas hechos a mano por Olga.">
+
+  <style>
+    /* =========================================================
+       1. COLORES Y AJUSTES GENERALES
+       ---------------------------------------------------------
+       Cambia aquí los colores de toda la web. Cada variable
+       se usa en muchos sitios, así que basta con tocarla una vez.
+       ========================================================= */
+    :root {
+      --lino:          #f5efe3;  /* fondo general (crema/lino) */
+      --lino-oscuro:   #ebe2d0;  /* fondo de secciones alternas */
+      --papel:         #fffaf1;  /* fondo de tarjetas */
+      --tierra:        #4a3b2c;  /* texto principal (marrón oscuro) */
+      --tierra-suave:  #6e5c49;  /* texto secundario */
+      --ocre:          #b07a2a;  /* acentos dorados */
+      --oliva:         #5f6b3a;  /* verde oliva */
+      --oliva-claro:   #8a9660;  /* verde oliva claro */
+      --terracota:     #b5654a;  /* terracota suave */
+      --sombra:        0 6px 20px rgba(74, 59, 44, 0.14);
+      --sombra-fuerte: 0 12px 32px rgba(74, 59, 44, 0.22);
+      --radio:         10px;     /* redondeo de esquinas */
+      --alto-menu:     64px;     /* altura del menú superior */
+
+      /* Tipografías del sistema (no necesitan internet) */
+      --fuente-titulos: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+      --fuente-texto:   system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    /* Reinicio básico para que todos los navegadores se comporten igual */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;                    /* desplazamiento suave al pulsar el menú */
+      scroll-padding-top: calc(var(--alto-menu) + 12px); /* para que el menú fijo no tape los títulos */
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--fuente-texto);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--tierra);
+      background-color: var(--lino);
+      /* Textura de lino hecha solo con CSS: líneas finas cruzadas
+         y unas manchas muy suaves que imitan el papel. */
+      background-image:
+        repeating-linear-gradient(0deg,  rgba(120, 95, 60, 0.035) 0 1px, transparent 1px 4px),
+        repeating-linear-gradient(90deg, rgba(120, 95, 60, 0.035) 0 1px, transparent 1px 4px),
+        radial-gradient(circle at 20% 30%, rgba(176, 122, 42, 0.06), transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(95, 107, 58, 0.06), transparent 45%);
+      background-attachment: fixed;
+    }
+
+    img { max-width: 100%; display: block; }
+
+    h1, h2, h3 {
+      font-family: var(--fuente-titulos);
+      font-weight: normal;
+      line-height: 1.2;
+      color: var(--tierra);
+    }
+
+    a { color: var(--oliva); }
+
+    /* Foco visible para quien navega con teclado */
+    :focus-visible {
+      outline: 3px solid var(--ocre);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    /* Contenedor central para que el texto no se estire demasiado */
+    .contenedor {
+      width: min(1100px, 100% - 2.5rem);
+      margin-inline: auto;
+    }
+
+    section { padding: 5rem 0; }
+
+    .titulo-seccion {
+      text-align: center;
+      font-size: clamp(1.9rem, 4vw, 2.6rem);
+      margin: 0 0 0.5rem;
+    }
+
+    .subtitulo-seccion {
+      text-align: center;
+      color: var(--tierra-suave);
+      max-width: 40rem;
+      margin: 0 auto 2.5rem;
+    }
+
+    /* Pequeña hoja decorativa bajo los títulos */
+    .adorno {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+      color: var(--oliva-claro);
+    }
+    .adorno::before,
+    .adorno::after {
+      content: "";
+      width: 50px;
+      height: 1px;
+      background: currentColor;
+      opacity: 0.6;
+    }
+    .adorno svg { width: 22px; height: 22px; }
+
+    /* Texto oculto a la vista pero leído por lectores de pantalla */
+    .solo-lector {
+      position: absolute;
+      width: 1px; height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+
+    /* =========================================================
+       2. MENÚ DE NAVEGACIÓN (fijo arriba)
+       ========================================================= */
+    .menu {
+      position: fixed;
+      inset: 0 0 auto 0;
+      height: var(--alto-menu);
+      z-index: 50;
+      background: rgba(245, 239, 227, 0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(74, 59, 44, 0.1);
+      transition: box-shadow 0.3s;
+    }
+    .menu.con-sombra { box-shadow: 0 2px 14px rgba(74, 59, 44, 0.12); }
+
+    .menu .contenedor {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .menu-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--fuente-titulos);
+      font-size: 1.3rem;
+      color: var(--tierra);
+      text-decoration: none;
+    }
+    .menu-logo svg { width: 24px; height: 24px; color: var(--oliva); }
+
+    .menu-enlaces {
+      display: flex;
+      gap: 0.4rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .menu-enlaces a {
+      display: block;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      color: var(--tierra);
+      text-decoration: none;
+      transition: background 0.25s, color 0.25s;
+    }
+    .menu-enlaces a:hover { background: var(--lino-oscuro); color: var(--oliva); }
+
+    /* Botón "hamburguesa" que solo aparece en móvil */
+    .menu-boton {
+      display: none;
+      background: none;
+      border: 0;
+      padding: 0.5rem;
+      cursor: pointer;
+      color: var(--tierra);
+    }
+    .menu-boton svg { width: 28px; height: 28px; }
+
+    @media (max-width: 720px) {
+      .menu-boton { display: block; }
+      .menu-enlaces {
+        position: absolute;
+        top: var(--alto-menu);
+        left: 0; right: 0;
+        flex-direction: column;
+        gap: 0;
+        padding: 0.5rem 1.25rem 1rem;
+        background: var(--lino);
+        border-bottom: 1px solid rgba(74, 59, 44, 0.1);
+        box-shadow: 0 8px 16px rgba(74, 59, 44, 0.1);
+        display: none;
+      }
+      .menu-enlaces.abierto { display: flex; }
+      .menu-enlaces a { padding: 0.8rem 0.5rem; border-radius: 6px; }
+    }
+
+
+    /* =========================================================
+       3. CABECERA (portada)
+       ========================================================= */
+    .cabecera {
+      position: relative;
+      min-height: 88vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: calc(var(--alto-menu) + 3rem) 1.25rem 4rem;
+      overflow: hidden;
+    }
+    .cabecera h1 {
+      font-size: clamp(2.6rem, 8vw, 5rem);
+      margin: 0.5rem 0 1rem;
+      letter-spacing: 0.01em;
+    }
+    .cabecera p {
+      font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+      color: var(--tierra-suave);
+      max-width: 36rem;
+      margin: 0 auto 2rem;
+    }
+    .cabecera .etiqueta {
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      font-size: 0.8rem;
+      color: var(--ocre);
+    }
+
+    /* Hojas grandes y muy suaves de fondo */
+    .hoja-fondo {
+      position: absolute;
+      color: var(--oliva-claro);
+      opacity: 0.13;
+      pointer-events: none;
+    }
+    .hoja-fondo.uno  { width: 260px; top: 12%;  left: -60px;  transform: rotate(-25deg); }
+    .hoja-fondo.dos  { width: 200px; bottom: 6%; right: -40px; transform: rotate(140deg); color: var(--terracota); }
+    .hoja-fondo.tres { width: 90px;  top: 22%;  right: 14%;   transform: rotate(35deg);  color: var(--ocre); }
+
+    .boton {
+      display: inline-block;
+      padding: 0.8rem 1.8rem;
+      border-radius: 999px;
+      background: var(--oliva);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: var(--sombra);
+      transition: background 0.25s, transform 0.25s;
+    }
+    .boton:hover { background: var(--tierra); transform: translateY(-2px); }
+
+
+    /* =========================================================
+       4. SOBRE OLGA
+       ========================================================= */
+    .sobre {
+      background: var(--lino-oscuro);
+    }
+    .sobre-contenido {
+      display: grid;
+      grid-template-columns: minmax(220px, 340px) 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    .sobre-foto {
+      position: relative;
+      aspect-ratio: 4 / 5;
+      border-radius: var(--radio);
+      overflow: hidden;
+      box-shadow: var(--sombra-fuerte);
+      background: var(--papel);
+      /* Un ligero giro para que parezca una foto colocada a mano */
+      transform: rotate(-2deg);
+      border: 10px solid var(--papel);
+    }
+    .sobre-foto img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 62% 30%;  /* encuadre: centra la cara en la foto */
+    }
+    .sobre-texto h3 {
+      font-size: 1.6rem;
+      margin: 0 0 1rem;
+      color: var(--oliva);
+    }
+    .sobre-texto p { margin: 0 0 1rem; }
+    .firma {
+      font-family: var(--fuente-titulos);
+      font-style: italic;
+      font-size: 1.3rem;
+      color: var(--terracota);
+    }
+
+    @media (max-width: 720px) {
+      .sobre-contenido { grid-template-columns: 1fr; gap: 2rem; }
+      .sobre-foto { max-width: 280px; margin-inline: auto; }
+    }
+
+
+    /* =========================================================
+       5. GALERÍA
+       ========================================================= */
+    .filtros {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-bottom: 2.5rem;
+    }
+    .filtro {
+      font: inherit;
+      font-size: 0.95rem;
+      padding: 0.55rem 1.3rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--oliva-claro);
+      background: transparent;
+      color: var(--tierra);
+      cursor: pointer;
+      transition: background 0.25s, color 0.25s, border-color 0.25s;
+    }
+    .filtro:hover { background: rgba(138, 150, 96, 0.15); }
+    .filtro.activo {
+      background: var(--oliva);
+      border-color: var(--oliva);
+      color: #fff;
+    }
+
+    /* Cuadrícula que se adapta sola al ancho de la pantalla */
+    .galeria {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.6rem;
+    }
+
+    .obra {
+      margin: 0;
+      background: var(--papel);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra);
+      overflow: hidden;
+      transition: opacity 0.35s ease, transform 0.35s ease, box-shadow 0.3s;
+    }
+    .obra:hover { box-shadow: var(--sombra-fuerte); }
+
+    /* Estado intermedio mientras una obra se oculta con el filtro */
+    .obra.saliendo {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+    /* Obra oculta del todo por el filtro */
+    .obra.oculta { display: none; }
+
+    /* El botón ocupa toda la imagen: así se puede abrir con teclado */
+    .obra-boton {
+      display: block;
+      width: 100%;
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: zoom-in;
+      overflow: hidden;
+      aspect-ratio: 4 / 5;
+      border-radius: var(--radio) var(--radio) 0 0;
+    }
+    .obra-boton img,
+    .obra-boton .marcador {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    /* Leve zoom al pasar el ratón */
+    .obra-boton:hover img,
+    .obra-boton:hover .marcador,
+    .obra-boton:focus-visible img,
+    .obra-boton:focus-visible .marcador { transform: scale(1.05); }
+
+    .obra figcaption {
+      padding: 0.9rem 1.1rem 1.1rem;
+    }
+    .obra-titulo {
+      display: block;
+      font-family: var(--fuente-titulos);
+      font-size: 1.15rem;
+    }
+    .obra-tecnica {
+      display: inline-block;
+      margin-top: 0.3rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      color: var(--tierra-suave);
+    }
+    .obra-tecnica::before {
+      content: "";
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 0.45rem;
+      vertical-align: 1px;
+      background: var(--terracota);
+    }
+    .obra[data-tecnica="hojas"] .obra-tecnica::before { background: var(--oliva); }
+
+    /* Marcador de posición: aparece si la imagen todavía no existe */
+    .marcador {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      padding: 1.5rem;
+      text-align: center;
+      font-family: var(--fuente-titulos);
+      font-size: 1.15rem;
+      color: var(--tierra-suave);
+      background:
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.25) 0 2px, transparent 2px 10px),
+        linear-gradient(145deg, #efd9c6, #e2c3ac);   /* tono terracota para "tela" */
+    }
+    .marcador.hojas {
+      background:
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.25) 0 2px, transparent 2px 10px),
+        linear-gradient(145deg, #e3e6cf, #ccd2ac);   /* tono oliva para "hojas" */
+    }
+    .marcador svg { width: 48px; height: 48px; color: var(--terracota); opacity: 0.7; }
+    .marcador.hojas svg { color: var(--oliva); }
+    .marcador small {
+      font-family: var(--fuente-texto);
+      font-size: 0.78rem;
+      opacity: 0.8;
+    }
+
+    .galeria-vacia {
+      text-align: center;
+      color: var(--tierra-suave);
+      grid-column: 1 / -1;
+    }
+
+
+    /* =========================================================
+       6. PROCESO CREATIVO
+       ========================================================= */
+    .proceso { background: var(--lino-oscuro); }
+
+    .tecnicas {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    .tecnica {
+      background: var(--papel);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra);
+      padding: 2rem;
+      border-top: 5px solid var(--terracota);
+    }
+    .tecnica.hojas { border-top-color: var(--oliva); }
+
+    .tecnica h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 1.6rem;
+      margin: 0 0 1.5rem;
+    }
+    .tecnica h3 svg { width: 28px; height: 28px; color: var(--terracota); }
+    .tecnica.hojas h3 svg { color: var(--oliva); }
+
+    /* Lista de pasos numerados con un círculo */
+    .pasos {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      counter-reset: paso;
+    }
+    .pasos li {
+      position: relative;
+      padding-left: 3.2rem;
+      margin-bottom: 1.4rem;
+      counter-increment: paso;
+    }
+    .pasos li:last-child { margin-bottom: 0; }
+    .pasos li::before {
+      content: counter(paso);
+      position: absolute;
+      left: 0; top: 0.1rem;
+      width: 2.2rem; height: 2.2rem;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      font-family: var(--fuente-titulos);
+      font-size: 1.1rem;
+      color: #fff;
+      background: var(--terracota);
+    }
+    .tecnica.hojas .pasos li::before { background: var(--oliva); }
+    .pasos strong {
+      display: block;
+      font-family: var(--fuente-titulos);
+      font-size: 1.15rem;
+      font-weight: normal;
+    }
+    .pasos p { margin: 0.2rem 0 0; color: var(--tierra-suave); }
+
+
+    /* =========================================================
+       7. PIE DE PÁGINA
+       ========================================================= */
+    .pie {
+      padding: 3rem 0;
+      text-align: center;
+      color: var(--tierra-suave);
+      font-size: 0.95rem;
+    }
+    .pie svg { width: 26px; height: 26px; color: var(--oliva-claro); margin: 0 auto 0.6rem; display: block; }
+    .pie p { margin: 0.2rem 0; }
+
+
+    /* =========================================================
+       8. LIGHTBOX (obra ampliada a pantalla completa)
+       ========================================================= */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 4.5rem 2rem;
+      background: rgba(30, 24, 18, 0.93);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+    .lightbox.abierto { opacity: 1; visibility: visible; }
+
+    .lightbox-figura {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 100%;
+      max-height: 100%;
+    }
+    .lightbox-figura img,
+    .lightbox-figura .marcador {
+      max-width: min(1000px, 100%);
+      max-height: calc(100vh - 10rem);
+      border-radius: 6px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+    .lightbox-figura .marcador {
+      width: min(420px, 80vw);
+      aspect-ratio: 4 / 5;
+    }
+    .lightbox-figura figcaption {
+      margin-top: 1rem;
+      text-align: center;
+      color: #f5efe3;
+      font-family: var(--fuente-titulos);
+      font-size: 1.3rem;
+    }
+    .lightbox-figura figcaption small {
+      display: block;
+      font-family: var(--fuente-texto);
+      font-size: 0.85rem;
+      opacity: 0.75;
+    }
+
+    .lightbox button {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      width: 48px; height: 48px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(245, 239, 227, 0.12);
+      color: #f5efe3;
+      cursor: pointer;
+      transition: background 0.25s;
+    }
+    .lightbox button:hover { background: rgba(245, 239, 227, 0.28); }
+    .lightbox button svg { width: 26px; height: 26px; }
+    .lightbox-cerrar    { top: 1rem; right: 1rem; }
+    .lightbox-anterior  { left: 1rem;  top: 50%; transform: translateY(-50%); }
+    .lightbox-siguiente { right: 1rem; top: 50%; transform: translateY(-50%); }
+
+    @media (max-width: 600px) {
+      .lightbox { padding: 4rem 1rem 5.5rem; }
+      /* En móvil, las flechas bajan para no tapar la obra */
+      .lightbox-anterior,
+      .lightbox-siguiente { top: auto; bottom: 1.2rem; transform: none; }
+      .lightbox-anterior  { left: calc(50% - 60px); }
+      .lightbox-siguiente { right: calc(50% - 60px); }
+    }
+
+    /* Evita que la página de detrás se desplace con el lightbox abierto */
+    body.sin-scroll { overflow: hidden; }
+
+
+    /* =========================================================
+       9. ANIMACIÓN DE APARICIÓN AL HACER SCROLL
+       ========================================================= */
+    .aparecer {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .aparecer.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* Si la persona prefiere menos movimiento, lo respetamos */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+      .aparecer { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================================================
+       DIBUJOS DE HOJAS (SVG) reutilizables en toda la página.
+       Se definen una vez aquí y se usan con <use href="#...">.
+       ========================================================= -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <!-- Hoja sencilla -->
+    <symbol id="icono-hoja" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M20.5 3.5C12 3 5 7 4 14.5c-.2 1.6 0 3 .5 4.3L3 20.3l1 1 1.6-1.6c1.2.5 2.6.6 4 .4C17 19 21 12 20.5 3.5z"/>
+      <path fill="none" stroke="#f5efe3" stroke-width="1.1" stroke-linecap="round" d="M5.6 19.4C9 15 13 10.5 18 6M9 15.2l-.2-3.6M11.6 12.4l3.6-.3M13.4 10.5l-.1-3"/>
+    </symbol>
+    <!-- Hoja grande con nervios, para decorar fondos -->
+    <symbol id="hoja-grande" viewBox="0 0 100 100">
+      <path fill="currentColor" d="M50 4C25 22 14 46 22 70c5 14 16 22 28 26 12-4 23-12 28-26C86 46 75 22 50 4z"/>
+      <path fill="none" stroke="#f5efe3" stroke-width="1.6" stroke-linecap="round"
+            d="M50 12v84M50 30l-14-10M50 30l14-10M50 46l-20-12M50 46l20-12M50 62l-22-12M50 62l22-12M50 78l-18-10M50 78l18-10"/>
+    </symbol>
+    <!-- Pincel, para la pintura en tela -->
+    <symbol id="icono-pincel" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M20.7 2.3a1 1 0 0 0-1.4 0l-9 9 3.4 3.4 9-9a1 1 0 0 0 0-1.4zM9.3 12.7c-2 0-3.6 1.6-3.6 3.6 0 1.4-.9 2.4-2.7 2.7 1.3 1.7 3.2 2.5 5 2.5 3 0 5-2 5-4.5z"/>
+    </symbol>
+  </svg>
+
+
+  <!-- =========================================================
+       MENÚ DE NAVEGACIÓN
+       ========================================================= -->
+  <header class="menu" id="menu">
+    <nav class="contenedor" aria-label="Menú principal">
+      <a class="menu-logo" href="#inicio">
+        <svg aria-hidden="true"><use href="#icono-hoja"></use></svg>
+        El taller de Olga
+      </a>
+
+      <button class="menu-boton" id="menuBoton" aria-label="Abrir menú" aria-expanded="false" aria-controls="menuEnlaces">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+
+      <ul class="menu-enlaces" id="menuEnlaces">
+        <li><a href="#sobre">Sobre Olga</a></li>
+        <li><a href="#galeria">Galería</a></li>
+        <li><a href="#proceso">Proceso creativo</a></li>
+      </ul>
+    </nav>
+  </header>
+
+
+  <main>
+
+    <!-- =========================================================
+         1. CABECERA
+         (Cambia aquí el título y la frase de bienvenida)
+         ========================================================= -->
+    <section class="cabecera" id="inicio">
+      <svg class="hoja-fondo uno"  viewBox="0 0 100 100" aria-hidden="true"><use href="#hoja-grande"></use></svg>
+      <svg class="hoja-fondo dos"  viewBox="0 0 100 100" aria-hidden="true"><use href="#hoja-grande"></use></svg>
+      <svg class="hoja-fondo tres" viewBox="0 0 100 100" aria-hidden="true"><use href="#hoja-grande"></use></svg>
+
+      <div class="aparecer">
+        <span class="etiqueta">Pintura en tela · Cuadros con hojas secas</span>
+        <h1>El taller de Olga</h1>
+        <p>Bienvenidos a mi pequeño rincón. Aquí guardo, con mucho cariño, lo que nace entre pinceles, telas y hojas recogidas en mis paseos.</p>
+        <a class="boton" href="#galeria">Ver mis obras</a>
+      </div>
+    </section>
+
+
+    <!-- =========================================================
+         2. SOBRE OLGA
+         (Cambia la foto "imagenes/olga.jpg" y los párrafos)
+         ========================================================= -->
+    <section class="sobre" id="sobre">
+      <div class="contenedor">
+        <div class="adorno" aria-hidden="true"><svg><use href="#icono-hoja"></use></svg></div>
+        <h2 class="titulo-seccion">Sobre Olga</h2>
+        <p class="subtitulo-seccion">Un poco de mí y de cómo empezó todo.</p>
+
+        <div class="sobre-contenido">
+          <!-- Si la foto no existe, el JavaScript pone un recuadro en su lugar -->
+          <div class="sobre-foto aparecer">
+            <img src="imagenes/olga.jpg" alt="Retrato de Olga en su taller" data-marcador="Foto de Olga">
+          </div>
+
+          <div class="sobre-texto aparecer">
+            <h3>Hola, soy Olga</h3>
+            <p>
+              Siempre me ha gustado crear con las manos. Empecé pintando sobre tela casi por casualidad,
+              con un mantel viejo y unas pinturas que me regalaron, y desde entonces no he parado.
+            </p>
+            <p>
+              Con los años descubrí también la magia de las hojas secas: las recojo en otoño, las prenso
+              con paciencia y las convierto en pequeños cuadros que guardan un trocito de cada paseo.
+            </p>
+            <p>
+              Esta página es para compartir con vosotros, mi familia y amigos, todo lo que voy haciendo.
+              ¡Gracias por pasaros!
+            </p>
+            <p class="firma">— Olga</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =========================================================
+         3. GALERÍA
+         Las obras NO se escriben aquí: se crean solas desde
+         la lista "obras" del JavaScript (al final del archivo).
+         ========================================================= -->
+    <section id="galeria">
+      <div class="contenedor">
+        <div class="adorno" aria-hidden="true"><svg><use href="#icono-hoja"></use></svg></div>
+        <h2 class="titulo-seccion">Galería</h2>
+        <p class="subtitulo-seccion">Pulsa sobre cualquier obra para verla en grande.</p>
+
+        <div class="filtros" role="group" aria-label="Filtrar obras por técnica">
+          <button class="filtro activo" data-filtro="todas" aria-pressed="true">Todas</button>
+          <button class="filtro" data-filtro="tela"  aria-pressed="false">Pintura en tela</button>
+          <button class="filtro" data-filtro="hojas" aria-pressed="false">Hojas secas</button>
+        </div>
+
+        <!-- Aquí el JavaScript coloca las obras automáticamente -->
+        <div class="galeria" id="galeriaObras"></div>
+      </div>
+    </section>
+
+
+    <!-- =========================================================
+         4. PROCESO CREATIVO
+         (Cambia libremente los títulos y textos de cada paso)
+         ========================================================= -->
+    <section class="proceso" id="proceso">
+      <div class="contenedor">
+        <div class="adorno" aria-hidden="true"><svg><use href="#icono-hoja"></use></svg></div>
+        <h2 class="titulo-seccion">Proceso creativo</h2>
+        <p class="subtitulo-seccion">Cada obra lleva su tiempo. Así es como trabajo en cada técnica.</p>
+
+        <div class="tecnicas">
+
+          <!-- Técnica 1: Pintura en tela -->
+          <article class="tecnica tela aparecer">
+            <h3>
+              <svg aria-hidden="true"><use href="#icono-pincel"></use></svg>
+              Pintura en tela
+            </h3>
+            <ol class="pasos">
+              <li>
+                <strong>Materiales</strong>
+                <p>Tela de algodón o lino, pinturas textiles, pinceles de distintos grosores y un bastidor para tensar.</p>
+              </li>
+              <li>
+                <strong>Preparación</strong>
+                <p>Lavo y plancho la tela, la tenso en el bastidor y dibujo el motivo a lápiz muy suave.</p>
+              </li>
+              <li>
+                <strong>Elaboración</strong>
+                <p>Pinto por capas, de los colores claros a los oscuros, dejando secar cada una antes de seguir.</p>
+              </li>
+              <li>
+                <strong>Acabado</strong>
+                <p>Fijo la pintura con la plancha para que aguante los lavados y repaso los detalles finales.</p>
+              </li>
+            </ol>
+          </article>
+
+          <!-- Técnica 2: Cuadros con hojas secas -->
+          <article class="tecnica hojas aparecer">
+            <h3>
+              <svg aria-hidden="true"><use href="#icono-hoja"></use></svg>
+              Cuadros con hojas secas
+            </h3>
+            <ol class="pasos">
+              <li>
+                <strong>Materiales</strong>
+                <p>Hojas y flores recogidas en paseos, papel secante, cartulina de color, cola blanca y un marco con cristal.</p>
+              </li>
+              <li>
+                <strong>Preparación</strong>
+                <p>Prenso las hojas entre libros y papel secante durante dos o tres semanas, hasta que quedan bien planas.</p>
+              </li>
+              <li>
+                <strong>Elaboración</strong>
+                <p>Pruebo la composición sin pegar, moviendo cada hoja hasta que encaja, y después la fijo con mucho cuidado.</p>
+              </li>
+              <li>
+                <strong>Acabado</strong>
+                <p>Lo protejo con un barniz suave y lo enmarco con cristal para que el color dure muchos años.</p>
+              </li>
+            </ol>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- =========================================================
+       5. PIE DE PÁGINA
+       ========================================================= -->
+  <footer class="pie">
+    <svg aria-hidden="true"><use href="#icono-hoja"></use></svg>
+    <p>Hecho con cariño, pincel y hojas de otoño.</p>
+    <p>© <span id="anio"></span> El taller de Olga</p>
+  </footer>
+
+
+  <!-- =========================================================
+       LIGHTBOX (ventana para ver una obra en grande).
+       Está oculta hasta que se pulsa una obra.
+       ========================================================= -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Obra ampliada" aria-hidden="true">
+    <button class="lightbox-cerrar" id="lbCerrar" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <button class="lightbox-anterior" id="lbAnterior" aria-label="Obra anterior">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <button class="lightbox-siguiente" id="lbSiguiente" aria-label="Obra siguiente">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+    </button>
+
+    <figure class="lightbox-figura" id="lbFigura">
+      <!-- El JavaScript coloca aquí la imagen (o el marcador) -->
+      <div id="lbImagen"></div>
+      <figcaption id="lbTitulo"></figcaption>
+    </figure>
+  </div>
+
+
+  <script>
+    /* =========================================================
+       ★★★  AÑADE AQUÍ LAS NUEVAS OBRAS  ★★★
+       ---------------------------------------------------------
+       Cada línea es una obra. Para añadir una nueva, copia una
+       línea, pégala debajo y cambia los tres datos:
+         archivo: nombre de la foto dentro de la carpeta "imagenes"
+         titulo:  el nombre que quieres que aparezca
+         tecnica: "tela"  (pintura en tela)  o  "hojas" (hojas secas)
+       ¡Ojo! No olvides la coma al final de cada línea.
+       ========================================================= */
+    const obras = [
+      { archivo: "tela-01.jpg",  titulo: "#LaFamilia",                  tecnica: "tela"  },
+      { archivo: "tela-02.jpg",  titulo: "Neceser de flores",           tecnica: "tela"  },
+      { archivo: "tela-03.jpg",  titulo: "Peces de colores",            tecnica: "tela"  },
+      { archivo: "tela-04.jpg",  titulo: "Jardín de flores redondas",   tecnica: "tela"  },
+      { archivo: "tela-05.jpg",  titulo: "Lucía leyendo",               tecnica: "tela"  },
+      { archivo: "tela-06.jpg",  titulo: "Homenaje a La naranja mecánica", tecnica: "tela"  },
+      { archivo: "tela-07.jpg",  titulo: "El bombín naranja",           tecnica: "tela"  },
+      { archivo: "tela-08.jpg",  titulo: "Gatita sirena",               tecnica: "tela"  },
+      { archivo: "tela-09.jpg",  titulo: "Montañas al sol",             tecnica: "tela"  },
+      { archivo: "tela-10.jpg",  titulo: "Pie de gato",                 tecnica: "tela"  },
+
+      { archivo: "hojas-01.jpg", titulo: "Jardín bajo el sol",         tecnica: "hojas" },
+      { archivo: "hojas-02.jpg", titulo: "Hoja de otoño con violetas", tecnica: "hojas" },
+      { archivo: "hojas-03.jpg", titulo: "Arbolito en maceta dorada",  tecnica: "hojas" },
+      { archivo: "hojas-04.jpg", titulo: "Helecho y pétalo de rosa",   tecnica: "hojas" },
+    ];
+    /* ===================== FIN DE LA LISTA ===================== */
+
+
+    // Carpeta donde están las fotos (no hace falta tocarlo)
+    const CARPETA_IMAGENES = "imagenes/";
+
+    // Nombres "bonitos" de cada técnica, para mostrarlos en pantalla
+    const NOMBRES_TECNICA = {
+      tela:  "Pintura en tela",
+      hojas: "Cuadro con hojas secas",
+    };
+
+
+    /* ---------------------------------------------------------
+       Crea el recuadro de "marcador de posición" que se muestra
+       cuando una imagen todavía no existe en la carpeta.
+       --------------------------------------------------------- */
+    function crearMarcador(titulo, tecnica) {
+      const marcador = document.createElement("div");
+      marcador.className = "marcador " + (tecnica || "");
+      marcador.setAttribute("role", "img");
+      marcador.setAttribute("aria-label", titulo + " (imagen pendiente)");
+
+      const icono = tecnica === "tela" ? "#icono-pincel" : "#icono-hoja";
+      marcador.innerHTML =
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><use href="' + icono + '"></use></svg>' +
+        '<span></span><small>Imagen pendiente</small>';
+      marcador.querySelector("span").textContent = titulo; // textContent evita problemas con símbolos raros
+      return marcador;
+    }
+
+    /* Si una imagen falla al cargar:
+       1) primero la buscamos fuera de la carpeta "imagenes", junto al
+          index.html (por si las fotos se subieron sueltas);
+       2) si tampoco está ahí, ponemos el marcador de posición. */
+    function prepararImagen(img, titulo, tecnica) {
+      img.addEventListener("error", function alFallar() {
+        const ruta = img.getAttribute("src") || "";
+        if (ruta.indexOf(CARPETA_IMAGENES) === 0) {
+          img.src = ruta.slice(CARPETA_IMAGENES.length); // segundo intento, sin la carpeta
+        } else {
+          img.removeEventListener("error", alFallar);
+          img.replaceWith(crearMarcador(titulo, tecnica));
+        }
+      });
+    }
+
+
+    /* ---------------------------------------------------------
+       GENERAR LA GALERÍA a partir de la lista "obras"
+       --------------------------------------------------------- */
+    const galeria = document.getElementById("galeriaObras");
+
+    obras.forEach(function (obra, indice) {
+      const ruta = CARPETA_IMAGENES + obra.archivo;
+      const nombreTecnica = NOMBRES_TECNICA[obra.tecnica] || obra.tecnica;
+
+      // <figure> = tarjeta de la obra
+      const figura = document.createElement("figure");
+      figura.className = "obra aparecer";
+      figura.dataset.tecnica = obra.tecnica;
+      figura.dataset.indice = indice;
+
+      // Botón que contiene la imagen (para poder abrirla con teclado)
+      const boton = document.createElement("button");
+      boton.className = "obra-boton";
+      boton.type = "button";
+      boton.setAttribute("aria-label", "Ver en grande: " + obra.titulo);
+
+      const img = document.createElement("img");
+      img.src = ruta;
+      img.alt = obra.titulo + " — " + nombreTecnica;
+      img.loading = "lazy";
+      prepararImagen(img, obra.titulo, obra.tecnica);
+      boton.appendChild(img);
+
+      boton.addEventListener("click", function () { abrirLightbox(indice); });
+
+      // Pie con título y técnica
+      const pie = document.createElement("figcaption");
+      pie.innerHTML = '<span class="obra-titulo"></span><span class="obra-tecnica"></span>';
+      pie.querySelector(".obra-titulo").textContent = obra.titulo;
+      pie.querySelector(".obra-tecnica").textContent = nombreTecnica;
+
+      figura.appendChild(boton);
+      figura.appendChild(pie);
+      galeria.appendChild(figura);
+    });
+
+    // La foto de "Sobre Olga" también usa marcador si no existe
+    document.querySelectorAll("img[data-marcador]").forEach(function (img) {
+      prepararImagen(img, img.dataset.marcador, "hojas");
+    });
+
+
+    /* ---------------------------------------------------------
+       FILTROS: Todas / Pintura en tela / Hojas secas
+       --------------------------------------------------------- */
+    const botonesFiltro = document.querySelectorAll(".filtro");
+    let filtroActual = "todas";
+    const DURACION_FILTRO = 350; // milisegundos (igual que la transición CSS)
+
+    botonesFiltro.forEach(function (boton) {
+      boton.addEventListener("click", function () {
+        filtroActual = boton.dataset.filtro;
+
+        // Marcamos el botón activo
+        botonesFiltro.forEach(function (b) {
+          const activo = b === boton;
+          b.classList.toggle("activo", activo);
+          b.setAttribute("aria-pressed", activo);
+        });
+
+        document.querySelectorAll(".obra").forEach(function (tarjeta) {
+          const mostrar = filtroActual === "todas" || tarjeta.dataset.tecnica === filtroActual;
+
+          if (mostrar) {
+            // 1) La hacemos ocupar sitio otra vez  2) en el siguiente fotograma, fundido de entrada
+            tarjeta.classList.remove("oculta");
+            requestAnimationFrame(function () {
+              requestAnimationFrame(function () { tarjeta.classList.remove("saliendo"); });
+            });
+          } else {
+            // 1) Fundido de salida  2) al terminar, la quitamos del todo
+            tarjeta.classList.add("saliendo");
+            setTimeout(function () {
+              if (tarjeta.classList.contains("saliendo")) tarjeta.classList.add("oculta");
+            }, DURACION_FILTRO);
+          }
+        });
+      });
+    });
+
+    /* Devuelve la lista de obras que se ven ahora mismo con el filtro elegido */
+    function obrasVisibles() {
+      return obras
+        .map(function (obra, indice) { return indice; })
+        .filter(function (indice) {
+          return filtroActual === "todas" || obras[indice].tecnica === filtroActual;
+        });
+    }
+
+
+    /* ---------------------------------------------------------
+       LIGHTBOX: ver una obra a pantalla completa
+       --------------------------------------------------------- */
+    const lightbox    = document.getElementById("lightbox");
+    const lbImagen    = document.getElementById("lbImagen");
+    const lbTitulo    = document.getElementById("lbTitulo");
+    const lbCerrar    = document.getElementById("lbCerrar");
+    const lbAnterior  = document.getElementById("lbAnterior");
+    const lbSiguiente = document.getElementById("lbSiguiente");
+
+    let indiceAbierto = null;   // obra que se está mostrando
+    let focoAnterior  = null;   // elemento que tenía el foco antes de abrir
+
+    function mostrarObra(indice) {
+      const obra = obras[indice];
+      const nombreTecnica = NOMBRES_TECNICA[obra.tecnica] || obra.tecnica;
+      indiceAbierto = indice;
+
+      // Vaciamos y colocamos la nueva imagen (o el marcador si falla)
+      lbImagen.innerHTML = "";
+      const img = document.createElement("img");
+      img.src = CARPETA_IMAGENES + obra.archivo;
+      img.alt = obra.titulo + " — " + nombreTecnica;
+      prepararImagen(img, obra.titulo, obra.tecnica);
+      lbImagen.appendChild(img);
+
+      lbTitulo.innerHTML = "";
+      lbTitulo.textContent = obra.titulo;
+      const small = document.createElement("small");
+      small.textContent = nombreTecnica;
+      lbTitulo.appendChild(small);
+
+      // Si solo hay una obra visible, ocultamos las flechas
+      const hayVarias = obrasVisibles().length > 1;
+      lbAnterior.hidden  = !hayVarias;
+      lbSiguiente.hidden = !hayVarias;
+    }
+
+    function abrirLightbox(indice) {
+      focoAnterior = document.activeElement;
+      mostrarObra(indice);
+      lightbox.classList.add("abierto");
+      lightbox.setAttribute("aria-hidden", "false");
+      document.body.classList.add("sin-scroll");
+      lbCerrar.focus();
+    }
+
+    function cerrarLightbox() {
+      lightbox.classList.remove("abierto");
+      lightbox.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("sin-scroll");
+      indiceAbierto = null;
+      if (focoAnterior) focoAnterior.focus(); // devolvemos el foco a la obra pulsada
+    }
+
+    /* Pasa a la obra siguiente (+1) o anterior (-1), dando la vuelta al final */
+    function moverLightbox(paso) {
+      const visibles = obrasVisibles();
+      const posicion = visibles.indexOf(indiceAbierto);
+      const nueva = (posicion + paso + visibles.length) % visibles.length;
+      mostrarObra(visibles[nueva]);
+    }
+
+    lbCerrar.addEventListener("click", cerrarLightbox);
+    lbAnterior.addEventListener("click", function () { moverLightbox(-1); });
+    lbSiguiente.addEventListener("click", function () { moverLightbox(1); });
+
+    // Clic fuera de la obra (en el fondo oscuro) = cerrar
+    lightbox.addEventListener("click", function (evento) {
+      if (evento.target === lightbox || evento.target === document.getElementById("lbFigura")) {
+        cerrarLightbox();
+      }
+    });
+
+    // Teclado: Esc cierra, flechas pasan de obra, Tab no se escapa del lightbox
+    document.addEventListener("keydown", function (evento) {
+      if (indiceAbierto === null) return;
+
+      if (evento.key === "Escape")     cerrarLightbox();
+      if (evento.key === "ArrowLeft")  moverLightbox(-1);
+      if (evento.key === "ArrowRight") moverLightbox(1);
+
+      if (evento.key === "Tab") {
+        const enfocables = [lbCerrar, lbAnterior, lbSiguiente].filter(function (b) { return !b.hidden; });
+        const primero = enfocables[0];
+        const ultimo  = enfocables[enfocables.length - 1];
+        if (evento.shiftKey && document.activeElement === primero) {
+          evento.preventDefault(); ultimo.focus();
+        } else if (!evento.shiftKey && document.activeElement === ultimo) {
+          evento.preventDefault(); primero.focus();
+        }
+      }
+    });
+
+
+    /* ---------------------------------------------------------
+       APARICIÓN SUAVE AL HACER SCROLL (IntersectionObserver)
+       --------------------------------------------------------- */
+    const elementosAnimados = document.querySelectorAll(".aparecer");
+
+    if ("IntersectionObserver" in window) {
+      const observador = new IntersectionObserver(function (entradas) {
+        entradas.forEach(function (entrada) {
+          if (entrada.isIntersecting) {
+            entrada.target.classList.add("visible");
+            observador.unobserve(entrada.target); // solo se anima una vez
+          }
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+
+      elementosAnimados.forEach(function (el) { observador.observe(el); });
+    } else {
+      // Navegadores muy antiguos: lo mostramos todo directamente
+      elementosAnimados.forEach(function (el) { el.classList.add("visible"); });
+    }
+
+    // Cuando la animación de entrada termina, quitamos la clase "aparecer"
+    // de las obras para que no interfiera con la transición de los filtros.
+    galeria.addEventListener("transitionend", function (evento) {
+      const tarjeta = evento.target;
+      if (tarjeta.classList.contains("obra") && tarjeta.classList.contains("visible")) {
+        tarjeta.classList.remove("aparecer", "visible");
+      }
+    });
+
+
+    /* ---------------------------------------------------------
+       MENÚ: botón de móvil y sombra al bajar
+       --------------------------------------------------------- */
+    const menu        = document.getElementById("menu");
+    const menuBoton   = document.getElementById("menuBoton");
+    const menuEnlaces = document.getElementById("menuEnlaces");
+
+    menuBoton.addEventListener("click", function () {
+      const abierto = menuEnlaces.classList.toggle("abierto");
+      menuBoton.setAttribute("aria-expanded", abierto);
+      menuBoton.setAttribute("aria-label", abierto ? "Cerrar menú" : "Abrir menú");
+    });
+
+    // Al elegir una sección en móvil, cerramos el menú
+    menuEnlaces.addEventListener("click", function (evento) {
+      if (evento.target.tagName === "A") {
+        menuEnlaces.classList.remove("abierto");
+        menuBoton.setAttribute("aria-expanded", "false");
+        menuBoton.setAttribute("aria-label", "Abrir menú");
+      }
+    });
+
+    window.addEventListener("scroll", function () {
+      menu.classList.toggle("con-sombra", window.scrollY > 10);
+    }, { passive: true });
+
+
+    /* Año actual en el pie de página */
+    document.getElementById("anio").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
